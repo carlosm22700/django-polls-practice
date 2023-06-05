@@ -1,0 +1,39 @@
+<!-- 
+    The template system uses dot-lookup syntax to access variable attr.
+    In {{ question.question_text }}, Django does a dict. lookup on the obj question. Failing that, it tries an attribute lookip -which works. if attr. lookup fails, it tries a list-index lookup
+
+-->
+
+<form action="{% url 'polls:vote' question.id %}" method="post">
+  {% csrf_token %}
+  <fieldset>
+    <legend><h1>{{ question.question_text }}</h1></legend>
+    {% if error_message %}
+    <p><strong>{{ error_message }}</strong></p>
+    {% endif %} {% for choice in question.choice_set.all %}
+    <input
+      type="radio"
+      name="choice"
+      id="choice{{ forloop.counter }}"
+      value="{{ choice.id }}"
+    />
+    <label for="choice {{ forloop.counter }}">{{ choice.choice_text }}</label
+    ><br />
+    {% endfor %}
+  </fieldset>
+  <input type="submit" value="Vote" />
+</form>
+<!-- 
+*we create a radio button for each question choice.
+The value of each button is the associated question choice's ID. The name of each button is 'choice'.
+    -this mean that when someone selects one of the buttons to submit the form, it sends a POST date choice=# where # is the selected choice.
+
+*We set the form's action to {% url 'polls:vote' question.id %} and set the method="post".
+  - using post is important because we want to alter data server-side.
+
+*forloop.counter indicates how many times the for tag has gone through its loop
+
+*since we're creating a POST form (which can modfify date), we need to worry about Cross Site Request Forgeries:
+  - all POST forms that are targeted at internal URLS should use the  {% csrf_token %} template tag
+
+-->
